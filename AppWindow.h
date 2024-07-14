@@ -25,6 +25,7 @@ public:
 	virtual void onDestroy() override;
 	virtual void onFocus() override;
 	virtual void onKillFocus() override;
+	virtual void onSize() override;
 	// Inherited via InputListener
 	virtual void onKeyDown(int key) override;
 	virtual void onKeyUp(int key) override;
@@ -35,15 +36,26 @@ public:
 
 	virtual void onRightMouseDown(const Point& delta_mouse_pos) override;
 	virtual void onRightMouseUp(const Point& delta_mouse_pos) override;
+public:
+	void render();
+	void updateCamera();
+	void updateModel();
+	void updateSkybox();
+	void drawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps,
+	const ConstantBufferPtr& cb, const TexturePtr& tex);
 private:
 	SwapChainPtr m_swap_chain;
 	VertexBufferPtr m_vb;
 	ConstantBufferPtr m_cb;
+	ConstantBufferPtr m_skybox_cb;
 	VertexShaderPtr m_vs;
 	PixelShaderPtr m_ps;
+	PixelShaderPtr m_skybox_ps;
 	IndexBufferPtr m_ib;
 	TexturePtr m_wood_tex;
+	TexturePtr m_skybox_tex;
 	MeshPtr m_mesh;
+	MeshPtr m_skybox_mesh;
 private:
 	long m_old_delta;
 	long m_new_delta;
@@ -57,11 +69,18 @@ private:
 	float m_rot_y = 0.0f;
 	float m_rot_z = 0.0f;
 
+	float m_light_rot_y = 0.0f;
+
 	float m_scale_cube = 1.0f;
 
 	float m_forward = 0.0f;
 	float m_rightward = 0.0f;
 
 	Matrix4x4 m_world_cam;
+	Matrix4x4 m_view_cam;
+	Matrix4x4 m_proj_cam;
+
+	bool m_play_state = false;
+	bool m_fullscreen_state = false;
 };
 

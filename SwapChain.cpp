@@ -18,6 +18,7 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 	desc.OutputWindow = hwnd;
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
+	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	desc.Windowed = TRUE;
 
 	//Create the swap chain for the window indicated by HWND parameter
@@ -64,7 +65,7 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 
 	if (FAILED(hr))
 	{
-		throw std::exception("SwapChain not created successfully");
+		throw std::exception("Swap chain not created!");
 	}
 
 
@@ -73,8 +74,26 @@ SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system) :
 
 	if (FAILED(hr))
 	{
-		throw std::exception("SwapChain not created successfully");
+		throw std::exception("Swap chain not created!");
 	}
+	reloadBuffers(width, height);
+}
+
+void SwapChain::setFullscreen(bool full_screen, unsigned int width, unsigned int height)
+{
+	resize(width, height);
+	m_swap_chain->SetFullscreenState(full_screen, nullptr);
+}
+
+void SwapChain::resize(unsigned int width, unsigned int height)
+{
+	//releasing buffers first before resizing
+	if (m_rtv) m_rtv->Release();
+	if (m_dsv) m_dsv->Release();
+	//resizing the buffers
+	m_swap_chain->ResizeBuffers(1,width,height,DXGI_FORMAT_R8G8B8A8_UNORM,0);
+	//reloading the buffers w.r.t the new size
+	reloadBuffers(width, height);
 }
 
 
@@ -90,4 +109,56 @@ SwapChain::~SwapChain()
 	m_dsv->Release();
 	m_rtv->Release();
 	m_swap_chain->Release();
+}
+
+void SwapChain::reloadBuffers(unsigned int width, unsigned int height)
+{
+	//Get the back buffer color and create its render target view
+	//--------------------------------
+	ID3D11Device* device = m_system->m_d3d_device;
+	ID3D11Texture2D* buffer = NULL;
+	HRESULT hr = m_swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);
+
+	if (FAILED(hr))
+	{
+		throw std::exception("Swap chain not created!");
+	}
+
+	hr = device->CreateRenderTargetView(buffer, NULL, &m_rtv);
+	buffer->Release();
+
+	if (FAILED(hr))
+	{
+		throw std::exception("Swap chain not created!");
+	}
+
+	D3D11_TEXTURE2D_DESC tex_desc = {};
+	tex_desc.Width = width;
+	tex_desc.Height = height;
+	tex_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	tex_desc.MipLevels = 1;
+	tex_desc.SampleDesc.Count = 1;
+	tex_desc.SampleDesc.Quality = 0;
+	tex_desc.MiscFlags = 0;
+	tex_desc.ArraySize = 1;
+	tex_desc.CPUAccessFlags = 0;
+
+
+	hr = device->CreateTexture2D(&tex_desc, nullptr, &buffer);
+
+	if (FAILED(hr))
+	{
+		throw std::exception("SwapChain not created successfully");
+	}
+
+
+	hr = device->CreateDepthStencilView(buffer, NULL, &m_dsv);
+	buffer->Release();
+
+	if (FAILED(hr))
+	{
+		throw std::exception("SwapChain not created successfully");
+	}
 }

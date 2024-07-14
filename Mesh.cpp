@@ -44,15 +44,19 @@ Mesh::Mesh(const wchar_t* full_path) : Resource(full_path)
 			for (unsigned char v = 0; v < num_face_verts; v++)
 			{
 				tinyobj::index_t index = shapes[s].mesh.indices[index_offset + v];
-				//vertex indices
-				tinyobj::real_t vx = attribs.vertices[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.vertex_index) * 3 + 0];
+				//vertex
+				tinyobj::real_t vx = attribs.vertices[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.vertex_index) * 3];
 				tinyobj::real_t vy = attribs.vertices[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.vertex_index) * 3 + 1];
 				tinyobj::real_t vz = attribs.vertices[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.vertex_index) * 3 + 2];
-				//texture coords
-				tinyobj::real_t tx = attribs.texcoords[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.texcoord_index) * 2 + 0];
+				//texture
+				tinyobj::real_t tx = attribs.texcoords[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.texcoord_index) * 2];
 				tinyobj::real_t ty = attribs.texcoords[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.texcoord_index) * 2 + 1];
+				//normal
+				tinyobj::real_t nx = attribs.normals[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.normal_index) * 3];
+				tinyobj::real_t ny = attribs.normals[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.normal_index) * 3 + 1];
+				tinyobj::real_t nz = attribs.normals[static_cast<std::vector<tinyobj::real_t, std::allocator<tinyobj::real_t>>::size_type>(index.normal_index) * 3 + 2];
 
-				VertexMesh vertex(Vector3D(vx, vy, vz), Vector2D(tx, ty));
+				VertexMesh vertex(Vector3D(vx, vy, vz), Vector2D(tx, ty), Vector3D(nx, ny, nz));
 				list_vertices.push_back(vertex);
 
 				list_indices.push_back((unsigned int)index_offset + v);

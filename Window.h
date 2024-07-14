@@ -10,12 +10,15 @@ public:
 	bool isRun();
 	//to get window size
 	RECT getClientWindowSizeRect();
+	//to get screen size
+	RECT getScreenSize();
 	//events
 	virtual void onCreate();
 	virtual void onUpdate();
 	virtual void onDestroy();
 	virtual void onFocus();
 	virtual void onKillFocus();
+	virtual void onSize();
 	//release the window
 	~Window();
 private:

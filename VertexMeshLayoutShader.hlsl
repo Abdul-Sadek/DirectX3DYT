@@ -2,6 +2,7 @@ struct vs_input
 {
     float4 pos : POSITION0;
     float2 coord : TEXCOORD0;
+    float3 norm : NORMAL0;
 };
 
 struct vs_output

@@ -11,6 +11,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		// collected here..
 		break;
 	}
+	case WM_SIZE:
+	{
+		// Event fired when the window is resized
+		Window* window = (Window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (window) window->onSize();
+		break;
+	}
+	case WM_GETMINMAXINFO:
+	{
+		// Event fired when the window is resized
+		//and stops at the width / height specified below
+		LPMINMAXINFO minmax = (LPMINMAXINFO)lparam;
+		minmax->ptMinTrackSize.x = 50;
+		minmax->ptMinTrackSize.y = 50;
+		minmax->ptMaxTrackSize.x = 1920;
+		minmax->ptMaxTrackSize.y = 1080;
+		break;
+	}
 	case WM_SETFOCUS:
 	{
 		// Event fired when the window is focused
@@ -108,6 +126,14 @@ RECT Window::getClientWindowSizeRect()
 	return rc;
 }
 
+RECT Window::getScreenSize()
+{
+	RECT rc;
+	rc.right = ::GetSystemMetrics(SM_CXSCREEN); //width
+	rc.bottom = ::GetSystemMetrics(SM_CYSCREEN); //height
+	return rc;
+}
+
 void Window::onCreate()
 {
 }
@@ -126,6 +152,10 @@ void Window::onFocus()
 }
 
 void Window::onKillFocus()
+{
+}
+
+void Window::onSize()
 {
 }
 

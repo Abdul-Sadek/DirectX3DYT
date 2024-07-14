@@ -1,8 +1,6 @@
 #include "AppWindow.h"
 #include "InputSystem.h"
 
-
-
 int main() {
 	//creating resources
 	try
